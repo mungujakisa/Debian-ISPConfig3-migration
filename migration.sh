@@ -139,8 +139,8 @@ function files_migration {
   echo "#############Step3:                                  #######"
   echo "#############Copy group in /root/old-server          #######"
   echo "############################################################"
-  echo "#############Bitte Manuel migriren                   #######"
-  echo "#############mehr auf http://wiki.teris-cooper.de    #######"
+  echo "#############Please migrate manually                 #######"
+  echo "#############more at http://wiki.teris-cooper.de     #######"
   echo "############################################################"
   rsync $common_args $main_server:/var/backup/ /var/backup
   rsync $common_args $main_server:/etc/passwd /root/old-server/
@@ -154,7 +154,7 @@ function mailman_migration {
 	clear
   echo "############################################################"
   echo "############################################################"
-  echo "############Starte Mailman migration           #############"
+  echo "############Start Mailman migration            #############"
   echo "############################################################"
   rsync $common_args --compress --delete $main_server:/var/lib/mailman/lists /var/lib/mailman
   rsync $common_args --compress --delete $main_server:/var/lib/mailman/data /var/lib/mailman
