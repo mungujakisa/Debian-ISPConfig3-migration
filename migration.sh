@@ -2,16 +2,17 @@
 #
   echo "############################################################"
   echo "##                   Herzlich Willkommen                  ##"
-  echo "##   Bitte beachten Sie alle Hinweise und Empfehlungen    ##"
+  echo "##   Please follow all instructions and recommendations   ##"
   echo "##                                                        ##"
-  echo "##   Bei Fragen oder Problemen können Sie jederzeit       ##"
-  echo "##   unter http://wiki.teris-cooper.de nachlesen          ##"
+  echo "##   If you have any questions or problems you can always ##"
+  echo "##   contact us on http://wiki.teris-cooper.de            ##"
   echo "##                                                        ##"
-  echo "##  Gern können Sie auch eine E-Mail senden an:           ##"
-  echo "##  admin [at] teris-cooper [dot] de                      ##"
+  echo "##  You are also welcome to send an email to:             ##"
+  echo "##  admin [at] teris-cooper [dot] de   (original coder)   ##"
+  echo "##   or ceo at berocomputers dot com			  ##"
   echo "############################################################"
   echo ""
-  echo "Bitte geben Sie zunächst die Serveradresse Ihres Master Server ein:"
+  echo "Please enter the server address of your master server first:"
   read main_server
 
   
@@ -27,22 +28,22 @@ db_stop="service mysql stop"
 function menu {
 	clear
 	echo "############################################################"
-	echo "##                    Hauptmenu                           ##"
+	echo "##                    Main Menu                           ##"
 	echo "##                                                        ##"
-	echo "##Installation von RSync auf dem Remote Server starten (1)##"
-	echo "##MySql Syncronisation starten                         (2)##"
-	echo "##Webverzeichnis Syncronisation starten                (3)##"
-	echo "##E-Mail Syncronisation starten                        (4)##"
-	echo "##Passwörter und Benutzerkonten Syncronisation starten (5)##"
-	echo "##MailMan Syncronisation starten                       (6)##"
-	echo "##Programm beenden                                     (0)##"
+	echo "##Start the installation of RSync on the remote server (1)##"
+	echo "##MySql Syncronisation start                           (2)##"
+	echo "##Web Directory Syncronisation start                   (3)##"
+	echo "##E-Mail Syncronisation start                          (4)##"
+	echo "##Passwords and User Account Syncronisation start      (5)##"
+	echo "##MailMan Syncronisation start                         (6)##"
+	echo "##Exit Program                                         (0)##"
 	echo "############################################################"
 	read -n 1 eingabe
 }
 
 function install {
 	clear
-	echo "Installation von Rsync auf dem Remote Server..."
+	echo "Installation of Rsync on the Remote Server..."
 	ssh $main_server "$install_rsync"
 	echo "Ending"
 	menu
@@ -52,32 +53,32 @@ function db_migration {
 	clear
   echo "############################################################"
   echo "############################################################"
-  echo "##############Starte MySql Migration           #############"
+  echo "##############Start MySql Migration            #############"
   echo "##############Step1:                           #############"
-  echo "##############Erstelle Backup auf Remot Server #############"
+  echo "##############Create backup on remote server   #############"
   echo "############################################################"
   echo "##############Step2:                           #############"
-  echo "##############MySql Datenbank Kopieren         #############"
+  echo "##############MySql database copy              #############"
   echo "############################################################"
   echo "#############Step3:                            #############"
-  echo "#############MySql Datenabnk einspielen        #############"
+  echo "#############MySql Import Database	       #############"
   echo "############################################################"
   echo "############################################################"
   echo " "
-  echo "Erstelle Datenbank Backup................................................................"
-  echo "Bitte geben Sie das MySql-Passwort für den Benutzer ROOT auf dem Server $main_server ein:"
+  echo "Create database backup................................................................"
+  echo "Bplease enter the MySql password for the user ROOT on the server $ main_server:"
   read mysqlext
   ssh $main_server "mysqldump -u root -p$mysqlext --all-databases > fulldump.sql"
   clear
-  echo "Kopieren des Backups....................................................................."
+  echo "Copy the backup....................................................................."
   rsync $common_args $main_server:/root/mysql/ /root/mysql/
   clear
-  echo "Backup einspielen........................................................................"
-  echo "Bitte geben Sie das MySql-Passwort für den Benuter ROOT ein:............................."
+  echo "Backup import........................................................................"
+  echo "Please enter the MySql password for the user ROOT:............................."
   read mysql2
   mysql -u root -p$mysql2 < /root/mysql/fulldump.sql
   clear
-  echo "Führe MySql Check durch.................................................................."
+  echo "Run MySql check.................................................................."
   mysqlcheck -p -A --auto-repair
   echo "############################################################"
   echo "############################################################"
