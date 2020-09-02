@@ -3,7 +3,7 @@
   echo "############################################################"
   echo "##                   Herzlich Willkommen                  ##"
   echo "##   Please follow all instructions and recommendations   ##"
-  echo "##                                                        ##"
+  echo "##   Run this script on the new server                    ##"
   echo "##   If you have any questions or problems you can always ##"
   echo "##   contact us on http://wiki.teris-cooper.de            ##"
   echo "##                                                        ##"
@@ -12,7 +12,7 @@
   echo "##   or ceo at berocomputers dot com			  ##"
   echo "############################################################"
   echo ""
-  echo "Please enter the server address of your master server first:"
+  echo "Please enter the IP address or domain name of your old server first:"
   read main_server
 
   
@@ -66,7 +66,7 @@ function db_migration {
   echo "############################################################"
   echo " "
   echo "Create database backup................................................................"
-  echo "Bplease enter the MySql password for the user ROOT on the server $ main_server:"
+  echo "Please enter the MySql password for the user ROOT on the server $main_server:"
   read mysqlext
   ssh $main_server "mysqldump -u root -p$mysqlext --all-databases > fulldump.sql"
   clear
@@ -98,8 +98,9 @@ function www_migration {
   echo "##################Start Migration         ##################"
   echo "############################################################"
   $www_stop
-  rsync $common_args --compress --delete $main_server:/var/www/ /var/www
-  rsync $common_args --compress --delete $main_server:/var/log/ispconfig/httpd/ /var/log/ispconfig/httpd
+  rsync $common_args --compress --verbose --perms --delete $main_server:/var/www/ /var/www
+  rsync $common_args --compress --verbose --perms --delete $main_server:/var/log/ispconfig/httpd/ /var/log/ispconfig/httpd
+    
   $www_start
   echo "############################################################"
   echo "############################################################"
@@ -139,14 +140,30 @@ function files_migration {
   echo "#############Step3:                                  #######"
   echo "#############Copy group in /root/old-server          #######"
   echo "############################################################"
-  echo "#############Please migrate manually                 #######"
+  echo "#############Step4:                                  #######"
+  echo "#############Copy root folder /root/                 #######"
+  echo "############################################################"
+  echo "#############Attempting to auto import user accounts #######"
   echo "#############more at http://wiki.teris-cooper.de     #######"
   echo "############################################################"
   rsync $common_args $main_server:/var/backup/ /var/backup
   rsync $common_args $main_server:/etc/passwd /root/old-server/
   rsync $common_args $main_server:/etc/group  /root/old-server/
+  rsync $common_args $main_server:/etc/gshadow  /root/old-server/
+  rsync $common_args $main_server:/root/  /root/
   echo "############################################################"
   echo "############################################################"
+  echo "## exporting passwd, group, shadow and gshadow files #
+  awk -v LIMIT=$UGIDLIMIT -F: '($3>=LIMIT) && ($3!=65534)' /root/old-server/passwd > /root/old-server/passwd.mig
+  awk -v LIMIT=$UGIDLIMIT -F: '($3>=LIMIT) && ($3!=65534)' /root/old-server/group > /root/old-server/group.mig
+  awk -v LIMIT=$UGIDLIMIT -F: '($3>=LIMIT) && ($3!=65534) {print $1}' /root/old-server/passwd | tee - |egrep -f - /root/old-server/shadow > /root/old-server/shadow.mig
+  echo "## importing new accounts now to the new server##"
+  cat /root/old-server/passwd.mig >> /etc/passwd
+  cat /root/old-server/group.mig >> /etc/group
+  cat /root/old-server/shadow.mig >> /etc/shadow
+  cp /root/old-server/gshadow.mig /etc/gshadow
+
+  
   menu
 }
 
@@ -156,9 +173,9 @@ function mailman_migration {
   echo "############################################################"
   echo "############Start Mailman migration            #############"
   echo "############################################################"
-  rsync $common_args --compress --delete $main_server:/var/lib/mailman/lists /var/lib/mailman
-  rsync $common_args --compress --delete $main_server:/var/lib/mailman/data /var/lib/mailman
-  rsync $common_args --compress --delete $main_server:/var/lib/mailman/archives /var/lib/mailman
+  rsync $common_args --compress --perms --delete $main_server:/var/lib/mailman/lists /var/lib/mailman
+  rsync $common_args --compress --perms --delete $main_server:/var/lib/mailman/data /var/lib/mailman
+  rsync $common_args --compress --perms --delete $main_server:/var/lib/mailman/archives /var/lib/mailman
   cd /var/lib/mailman/bin && ./genaliases
   echo "############################################################"
   echo "############################################################"
