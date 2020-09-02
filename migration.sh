@@ -3,7 +3,7 @@
   echo "############################################################"
   echo "##                   Herzlich Willkommen                  ##"
   echo "##   Please follow all instructions and recommendations   ##"
-  echo "##   Run this script on the new server                    ##"
+  echo "##   Run this script on the new server and reboot         ##"
   echo "##   If you have any questions or problems you can always ##"
   echo "##   contact us on http://wiki.teris-cooper.de            ##"
   echo "##                                                        ##"
